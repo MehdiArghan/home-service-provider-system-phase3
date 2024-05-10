@@ -11,13 +11,13 @@ import java.util.List;
 public interface ExpertService {
     ExpertSummaryResponse save(MultipartFile multipartFile, ExpertRequest request);
 
-    List<ExpertSummaryResponse> findAllDisableExperts();
-
     ExpertSummaryResponse expertConfirmation(ExpertRequestWithEmail request);
 
     Expert findById(Long id);
 
     Expert findByEmail(String email);
+
+    List<ExpertSummaryResponse> findAllDisableExperts();
 
     List<ExpertSummaryResponse> findAll();
 }

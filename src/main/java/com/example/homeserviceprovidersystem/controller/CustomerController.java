@@ -69,4 +69,9 @@ public class CustomerController {
     public ResponseEntity<List<OrdersResponse>> findAllOrderWaitingForSpecialistToWorkPlace(@Valid @RequestBody CustomerRequestWithEmail request) {
         return new ResponseEntity<>(ordersService.findAllOrderWaitingForSpecialistToWorkPlace(request), HttpStatus.OK);
     }
+
+    @GetMapping(value = "/findAllStartedOrders")
+    public ResponseEntity<List<OrdersResponse>> findAllStartedOrders(@Valid @RequestBody CustomerRequestWithEmail request) {
+        return new ResponseEntity<>(ordersService.findAllStartedOrders(request), HttpStatus.OK);
+    }
 }

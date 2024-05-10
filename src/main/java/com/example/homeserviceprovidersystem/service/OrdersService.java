@@ -12,11 +12,13 @@ import java.util.List;
 public interface OrdersService {
     OrdersResponse save(OrderRequest request);
 
-    List<OrdersResponse> findAllOrderWaitingForSpecialistSuggestion(SubDutyRequestWithName request);
+    OrdersResponse selectStartWork(OrderSummaryRequest request);
 
     Orders findById(Long id);
 
+    List<OrdersResponse> findAllOrderWaitingForSpecialistSuggestion(SubDutyRequestWithName request);
+
     List<OrdersResponse> findAllOrderWaitingForSpecialistToWorkPlace(CustomerRequestWithEmail request);
 
-   OrdersResponse selectStartWork(OrderSummaryRequest request);
+    List<OrdersResponse> findAllStartedOrders(CustomerRequestWithEmail request);
 }

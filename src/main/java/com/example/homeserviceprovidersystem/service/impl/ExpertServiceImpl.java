@@ -97,16 +97,6 @@ public class ExpertServiceImpl implements ExpertService {
     }
 
     @Override
-    public List<ExpertSummaryResponse> findAllDisableExperts() {
-        List<Expert> expertList = expertRepository.findAllByExpertStatus(ExpertStatus.DISABLE);
-        if (expertList.isEmpty()) {
-            throw new CustomResourceNotFoundException("There is no result");
-        } else {
-            return expertList.stream().map(expertMapper::expertToExpertSummaryResponse).toList();
-        }
-    }
-
-    @Override
     public ExpertSummaryResponse expertConfirmation(ExpertRequestWithEmail request) {
         return expertRepository.findByEmail(request.getEmail())
                 .map(expert -> {
@@ -130,6 +120,16 @@ public class ExpertServiceImpl implements ExpertService {
     public Expert findByEmail(String email) {
         return expertRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomEntityNotFoundException("Expert with this email was not found"));
+    }
+
+    @Override
+    public List<ExpertSummaryResponse> findAllDisableExperts() {
+        List<Expert> expertList = expertRepository.findAllByExpertStatus(ExpertStatus.DISABLE);
+        if (expertList.isEmpty()) {
+            throw new CustomResourceNotFoundException("There is no result");
+        } else {
+            return expertList.stream().map(expertMapper::expertToExpertSummaryResponse).toList();
+        }
     }
 
     @Override
