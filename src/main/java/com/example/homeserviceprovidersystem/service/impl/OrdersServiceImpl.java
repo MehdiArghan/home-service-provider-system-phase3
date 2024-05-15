@@ -161,6 +161,17 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
+    public List<OrdersResponse> findAllDoneOrders(CustomerRequestWithEmail request) {
+        List<Orders> findAllOrder =ordersRepository.findAllByOrderStatusAndCustomerEmail
+                (OrderStatus.ORDER_DONE, request.getCustomerEmail());
+        if (findAllOrder.isEmpty()) {
+            throw new CustomResourceNotFoundException("There is no result");
+        } else {
+            return findAllOrder.stream().map(ordersMapper::orderToOrdersResponse).toList();
+        }
+    }
+
+    @Override
     public List<OrdersResponse> findAllStartedOrders(CustomerRequestWithEmail request) {
         List<Orders> findAllOrder =
                 ordersRepository.findAllByOrderStatusAndCustomerEmail(OrderStatus.ORDER_STARTED, request.getCustomerEmail());

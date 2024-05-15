@@ -22,5 +22,7 @@ public interface OrdersService {
 
     List<OrdersResponse> findAllOrderWaitingForSpecialistToWorkPlace(CustomerRequestWithEmail request);
 
+    List<OrdersResponse> findAllDoneOrders(CustomerRequestWithEmail request);
+
     List<OrdersResponse> findAllStartedOrders(CustomerRequestWithEmail request);
 }
