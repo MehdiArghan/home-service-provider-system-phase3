@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ExpertSuggestionsRepository extends JpaRepository<ExpertSuggestions, Long> {
@@ -20,4 +21,9 @@ public interface ExpertSuggestionsRepository extends JpaRepository<ExpertSuggest
             @Param("CUSTOMEREMAIL") String customerEmail,
             @Param("SUBDUTYNAME") String subDutyName,
             @Param("SELECTION") OrderStatus orderStatus);
+
+    @Query("from ExpertSuggestions es where es.expert.email=:EXPERTEMAIL and es.orders.id=:ORDERSID")
+    Optional<ExpertSuggestions> findByExpertEmailAndOrderId(
+            @Param("EXPERTEMAIL") String expertEmail,
+            @Param("ORDERSID") Long ordersId);
 }

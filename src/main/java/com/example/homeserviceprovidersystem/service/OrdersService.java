@@ -14,6 +14,8 @@ public interface OrdersService {
 
     OrdersResponse selectStartWork(OrderSummaryRequest request);
 
+    OrdersResponse endOfOrder(OrderSummaryRequest request);
+
     Orders findById(Long id);
 
     List<OrdersResponse> findAllOrderWaitingForSpecialistSuggestion(SubDutyRequestWithName request);

@@ -15,5 +15,7 @@ public interface ExpertSuggestionsService {
 
     ExpertSuggestions findById(Long id);
 
+    ExpertSuggestions findByExpertEmailAndOrderId(String expertEmail,Long orderId);
+
     ExpertSuggestionsResponse selectExpertSuggestion(ExpertSuggestionsRequestWithId request);
 }

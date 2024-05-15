@@ -50,6 +50,11 @@ public class CustomerController {
         return new ResponseEntity<>(ordersService.selectStartWork(request), HttpStatus.OK);
     }
 
+    @PatchMapping(value = "/endOfOrder")
+    public ResponseEntity<OrdersResponse> endOfOrder(@Valid @RequestBody OrderSummaryRequest request) {
+        return new ResponseEntity<>(ordersService.endOfOrder(request), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/findAllSubDuty")
     public ResponseEntity<List<SubDutyResponse>> findAllSubDuty() {
         return new ResponseEntity<>(subDutyService.findAll(), HttpStatus.OK);

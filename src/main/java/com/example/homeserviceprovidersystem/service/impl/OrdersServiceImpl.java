@@ -9,29 +9,31 @@ import com.example.homeserviceprovidersystem.dto.order.OrderRequest;
 import com.example.homeserviceprovidersystem.dto.order.OrderSummaryRequest;
 import com.example.homeserviceprovidersystem.dto.order.OrdersResponse;
 import com.example.homeserviceprovidersystem.dto.subduty.SubDutyRequestWithName;
-import com.example.homeserviceprovidersystem.entity.Address;
-import com.example.homeserviceprovidersystem.entity.Customer;
-import com.example.homeserviceprovidersystem.entity.Orders;
-import com.example.homeserviceprovidersystem.entity.SubDuty;
+import com.example.homeserviceprovidersystem.entity.*;
+import com.example.homeserviceprovidersystem.entity.enums.ExpertStatus;
 import com.example.homeserviceprovidersystem.entity.enums.OrderStatus;
 import com.example.homeserviceprovidersystem.mapper.OrdersMapper;
+import com.example.homeserviceprovidersystem.repositroy.ExpertRepository;
 import com.example.homeserviceprovidersystem.repositroy.OrdersRepository;
 import com.example.homeserviceprovidersystem.service.CustomerService;
+import com.example.homeserviceprovidersystem.service.ExpertSuggestionsService;
 import com.example.homeserviceprovidersystem.service.OrdersService;
 import com.example.homeserviceprovidersystem.service.SubDutyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class OrdersServiceImpl implements OrdersService {
-    private final OrdersRepository ordersRepository;
     private final CustomerService customerService;
     private final SubDutyService subDutyService;
+    private final ExpertSuggestionsService expertSuggestionsService;
+    private final OrdersRepository ordersRepository;
+    private final ExpertRepository expertRepository;
     private final OrdersMapper ordersMapper;
 
     @Autowired
@@ -39,11 +41,15 @@ public class OrdersServiceImpl implements OrdersService {
             OrdersRepository ordersRepository,
             CustomerService customerService,
             SubDutyService subDutyService,
-            OrdersMapper ordersMapper) {
+            OrdersMapper ordersMapper,
+            @Lazy ExpertSuggestionsService expertSuggestionsService,
+            ExpertRepository expertRepository) {
         this.ordersRepository = ordersRepository;
         this.customerService = customerService;
         this.subDutyService = subDutyService;
         this.ordersMapper = ordersMapper;
+        this.expertSuggestionsService = expertSuggestionsService;
+        this.expertRepository = expertRepository;
     }
 
     @Override
@@ -83,27 +89,45 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public OrdersResponse selectStartWork(OrderSummaryRequest request) {
-        Optional<Orders> findOrder = ordersRepository.findByOrderInformation(request.getSubDutyName(), request.getCustomerEmail(), request.getProposedPrice()
+        Orders order = findOrderByOrderInformation(request, OrderStatus.ORDER_WAITING_FOR_SPECIALIST_TO_WORKPLACE);
+        validateOrder(order);
+        order.setOrderStatus(OrderStatus.ORDER_STARTED);
+        return ordersMapper.orderToOrdersResponse(ordersRepository.save(order));
+    }
+
+    private Orders findOrderByOrderInformation(OrderSummaryRequest request, OrderStatus orderStatus) {
+        return ordersRepository.findByOrderInformation(request.getSubDutyName(), request.getCustomerEmail(), request.getProposedPrice()
                 , request.getJobDescription(), request.getDateOfWork(), request.getTimeOfWord(), request.getAddress().getProvince(),
                 request.getAddress().getCity(), request.getAddress().getStreet(), request.getAddress().getPostalCode(),
-                OrderStatus.ORDER_WAITING_FOR_SPECIALIST_TO_WORKPLACE);
-        if (findOrder.isEmpty()) {
-            throw new CustomEntityNotFoundException("no order was found");
-        } else {
-            Orders order = findOrder.get();
-            validateOrder(order);
-            order.setOrderStatus(OrderStatus.ORDER_STARTED);
-            return ordersMapper.orderToOrdersResponse(ordersRepository.save(order));
-        }
+                orderStatus).orElseThrow(() -> new CustomEntityNotFoundException("no order was found"));
     }
 
     private void validateOrder(Orders orders) {
-        if (LocalDate.now().isBefore(orders.getDateOfWork())) {
-            throw new CustomBadRequestException("Date of Start Work must be on or after the date of work");
+        LocalDateTime timeNow = LocalDateTime.now();
+        LocalDateTime timeOrder = LocalDateTime.of(orders.getDateOfWork(), orders.getTimeOfWord());
+        if (timeNow.isBefore(timeOrder))
+            throw new CustomBadRequestException("The start date and time must be on or after the order date and time");
+    }
+
+    @Override
+    public OrdersResponse endOfOrder(OrderSummaryRequest request) {
+        Orders order = findOrderByOrderInformation(request, OrderStatus.ORDER_STARTED);
+        Expert expert = order.getExpert();
+        ExpertSuggestions expertSuggestions = expertSuggestionsService.findByExpertEmailAndOrderId(expert.getEmail(), order.getId());
+        LocalDateTime suggestionTimeOfStartWork = LocalDateTime.of(expertSuggestions.getDateOfStartWork(), expertSuggestions.getTimeOfStartWork());
+        LocalDateTime suggestionTimeOfEndWork = suggestionTimeOfStartWork.plusHours(expertSuggestions.getDurationOfWorkPerHour());
+        LocalDateTime timeNow = LocalDateTime.now();
+        if (timeNow.isAfter(suggestionTimeOfEndWork)) {
+            int delayedWorkingTime = (int) Duration.between(suggestionTimeOfEndWork, timeNow).toHours();
+            int expertScore = expert.getScore();
+            int finalScore = expertScore - delayedWorkingTime;
+            expert.setScore(finalScore);
+            if (finalScore < 0) expert.setExpertStatus(ExpertStatus.DISABLE);
+            expertRepository.save(expert);
         }
-        if (LocalTime.now().isBefore(orders.getTimeOfWord())) {
-            throw new CustomBadRequestException("Time of Start Work must be on or after the Time of work");
-        }
+        order.setOrderStatus(OrderStatus.ORDER_DONE);
+        Orders saveOrder = ordersRepository.save(order);
+        return ordersMapper.orderToOrdersResponse(saveOrder);
     }
 
     @Override

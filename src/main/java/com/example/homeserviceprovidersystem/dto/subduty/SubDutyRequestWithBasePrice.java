@@ -15,7 +15,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubDutyRequestWithBasePrice {
     @NotBlank(message = "please enter the appropriate nameSubDuty")
-    @Pattern(regexp = "[a-zA-Z]+", message = "nameSubDuty must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "nameSubDuty must contain only letters")
     String nameSubDuty;
     @NotNull(message = "please enter the appropriate price")
     @Positive(message = "please enter a positive price")

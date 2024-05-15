@@ -16,15 +16,15 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubDutyRequest {
     @NotBlank(message = "please enter an appropriate nameDuty")
-    @Pattern(regexp = "[a-zA-Z]+", message = "dutyName must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "dutyName must contain only letters")
     String nameDuty;
     @NotBlank(message = "please enter an appropriate nameSubDuty")
-    @Pattern(regexp = "[a-zA-Z]+", message = "subDutyName must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "subDutyName must contain only letters")
     String nameSubDuty;
     @NotNull(message = "please enter an appropriate price")
     @Positive(message = "please enter a positive price")
     double basePrice;
     @NotBlank(message = "please enter an appropriate description")
-    @Pattern(regexp = "[a-zA-Z]+", message = "description must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "description must contain only letters")
     String description;
 }

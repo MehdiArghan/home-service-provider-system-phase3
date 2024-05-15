@@ -18,7 +18,7 @@ import java.time.LocalTime;
 @ToString
 public class OrderRequest {
     @NotBlank(message = "please enter an appropriate nameSubDuty")
-    @Pattern(regexp = "[a-zA-Z]+", message = "subDutyName must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "subDutyName must contain only letters")
     String subDutyName;
     @NotNull(message = "email cannot be null")
     @Email(message = "please enter an appropriate Email")
@@ -27,7 +27,7 @@ public class OrderRequest {
     @Positive(message = "value proposedPrice must be positive")
     double ProposedPrice;
     @NotBlank(message = "please write a suitable description for the job")
-    @Pattern(regexp = "[a-zA-Z]+", message = "jobDescription must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "jobDescription must contain only letters")
     String jobDescription;
     @FutureOrPresent(message = "Date must be in the present or future")
     @DateTimeFormat(pattern = "yyyy-MM-dd")

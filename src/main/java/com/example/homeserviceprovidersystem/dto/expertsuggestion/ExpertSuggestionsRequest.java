@@ -15,7 +15,7 @@ import lombok.experimental.FieldDefaults;
 @ToString
 public class ExpertSuggestionsRequest {
     @NotBlank(message = "please enter an appropriate nameSubDuty")
-    @Pattern(regexp = "[a-zA-Z]+", message = "subDutyName must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "subDutyName must contain only letters")
     String subDutyName;
     @NotNull(message = "email cannot be null")
     @Email(message = "please enter an appropriate Email")

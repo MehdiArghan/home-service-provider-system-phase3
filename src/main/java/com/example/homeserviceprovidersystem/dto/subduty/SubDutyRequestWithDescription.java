@@ -13,9 +13,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SubDutyRequestWithDescription {
     @NotBlank(message = "please enter the appropriate nameSubDuty")
-    @Pattern(regexp = "[a-zA-Z]+", message = "nameSubDuty must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "nameSubDuty must contain only letters")
     String nameSubDuty;
     @NotBlank(message = "please enter the appropriate description")
-    @Pattern(regexp = "[a-zA-Z]+", message = "description must contain only letters")
+    @Pattern(regexp = "^[a-zA-Z ]+$", message = "description must contain only letters")
     String description;
 }

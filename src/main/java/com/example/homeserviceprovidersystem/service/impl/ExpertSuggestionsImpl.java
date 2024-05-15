@@ -23,8 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ExpertSuggestionsImpl implements ExpertSuggestionsService {
@@ -55,7 +57,8 @@ public class ExpertSuggestionsImpl implements ExpertSuggestionsService {
     public ExpertSuggestionsResponse save(ExpertSuggestionsSummaryRequest request) {
         Expert expert = expertService.findByEmail(request.getExpertEmail());
         Orders orders = ordersService.findById(request.getOrderId());
-        validateExpertSuggestions(expert, orders, request);
+        Optional<ExpertSuggestions> es = expertSuggestionsRepository.findByExpertEmailAndOrderId(expert.getEmail(), orders.getId());
+        validateExpertSuggestions(expert, orders, request, es);
         ExpertSuggestions expertSuggestions = setExpertSuggestionsDetails(request, orders, expert);
         ExpertSuggestions saveExpertSuggestion = expertSuggestionsRepository.save(expertSuggestions);
         updateOrdersStatus(orders);
@@ -65,18 +68,21 @@ public class ExpertSuggestionsImpl implements ExpertSuggestionsService {
     private void validateExpertSuggestions(
             Expert expert,
             Orders orders,
-            ExpertSuggestionsSummaryRequest expertSuggestions) {
+            ExpertSuggestionsSummaryRequest expertSuggestionsSummaryRequest,
+            Optional<ExpertSuggestions> es) {
 
         if (expert.getSubDuties().stream().noneMatch(subDuty -> orders.getSubDuty().getName().equals(subDuty.getName())) ||
-                orders.getSubDuty().getBasePrice() > expertSuggestions.getProposedPrice()) {
+                orders.getSubDuty().getBasePrice() > expertSuggestionsSummaryRequest.getProposedPrice()) {
             throw new CustomBadRequestException("Please select the order related to your specialty or " +
                     "Proposed price must be greater than or equal to the base price of the subDuty");
         }
-        if (expertSuggestions.getDateOfStartWork().isBefore(orders.getDateOfWork())) {
-            throw new CustomBadRequestException("Date of Start Work must be on or after the date of work");
+        LocalDateTime orderTime = LocalDateTime.of(orders.getDateOfWork(), orders.getTimeOfWord());
+        LocalDateTime expertSuggestionTime = LocalDateTime.of(expertSuggestionsSummaryRequest.getDateOfStartWork(), expertSuggestionsSummaryRequest.getTimeOfStartWork());
+        if (expertSuggestionTime.isBefore(orderTime)) {
+            throw new CustomBadRequestException("The start date and time must be on or after the order date and time");
         }
-        if (expertSuggestions.getTimeOfStartWork().isBefore(orders.getTimeOfWord())) {
-            throw new CustomBadRequestException("Time of Start Work must be on or after the Time of work");
+        if (es.isPresent()) {
+            throw new CustomBadRequestException("You have already submitted an suggestion for this order");
         }
     }
 
@@ -114,6 +120,12 @@ public class ExpertSuggestionsImpl implements ExpertSuggestionsService {
     public ExpertSuggestions findById(Long id) {
         return expertSuggestionsRepository.findById(id)
                 .orElseThrow(() -> new CustomEntityNotFoundException("expertSuggestion with this id was not found"));
+    }
+
+    @Override
+    public ExpertSuggestions findByExpertEmailAndOrderId(String expertEmail, Long orderId) {
+        return expertSuggestionsRepository.findByExpertEmailAndOrderId(expertEmail, orderId)
+                .orElseThrow(() -> new CustomEntityNotFoundException("No ExpertSuggestions found for this email"));
     }
 
     @Override
