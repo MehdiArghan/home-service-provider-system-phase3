@@ -15,10 +15,7 @@ import com.example.homeserviceprovidersystem.entity.enums.OrderStatus;
 import com.example.homeserviceprovidersystem.mapper.OrdersMapper;
 import com.example.homeserviceprovidersystem.repositroy.ExpertRepository;
 import com.example.homeserviceprovidersystem.repositroy.OrdersRepository;
-import com.example.homeserviceprovidersystem.service.CustomerService;
-import com.example.homeserviceprovidersystem.service.ExpertSuggestionsService;
-import com.example.homeserviceprovidersystem.service.OrdersService;
-import com.example.homeserviceprovidersystem.service.SubDutyService;
+import com.example.homeserviceprovidersystem.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -32,6 +29,7 @@ public class OrdersServiceImpl implements OrdersService {
     private final CustomerService customerService;
     private final SubDutyService subDutyService;
     private final ExpertSuggestionsService expertSuggestionsService;
+    private final WalletService walletService;
     private final OrdersRepository ordersRepository;
     private final ExpertRepository expertRepository;
     private final OrdersMapper ordersMapper;
@@ -41,12 +39,13 @@ public class OrdersServiceImpl implements OrdersService {
             OrdersRepository ordersRepository,
             CustomerService customerService,
             SubDutyService subDutyService,
-            OrdersMapper ordersMapper,
+            WalletService walletService, OrdersMapper ordersMapper,
             @Lazy ExpertSuggestionsService expertSuggestionsService,
             ExpertRepository expertRepository) {
         this.ordersRepository = ordersRepository;
         this.customerService = customerService;
         this.subDutyService = subDutyService;
+        this.walletService = walletService;
         this.ordersMapper = ordersMapper;
         this.expertSuggestionsService = expertSuggestionsService;
         this.expertRepository = expertRepository;
@@ -131,6 +130,30 @@ public class OrdersServiceImpl implements OrdersService {
     }
 
     @Override
+    public OrdersResponse orderPayment(OrderSummaryRequest request) {
+        Orders order = findOrderByOrderInformation(request, OrderStatus.ORDER_DONE);
+        Expert expert = order.getExpert();
+        Customer customer = order.getCustomer();
+        ExpertSuggestions expertSuggestions = expertSuggestionsService.findByExpertEmailAndOrderId(expert.getEmail(), order.getId());
+        double expertProposedPrice = expertSuggestions.getProposedPrice();
+        Wallet customerWallet = customer.getWallet();
+        if (customerWallet.getPrice() < expertProposedPrice) {
+            throw new CustomBadRequestException("The account balance is insufficient. Please top up your account");
+        } else {
+            Wallet expertWallet = expert.getWallet();
+            double expertAccountBalance = expertWallet.getPrice() + expertProposedPrice;
+            expertWallet.setPrice(expertAccountBalance);
+            double customerAccountBalance = customerWallet.getPrice() - expertProposedPrice;
+            customerWallet.setPrice(customerAccountBalance);
+            order.setOrderStatus(OrderStatus.ORDER_PAID);
+            walletService.save(expertWallet);
+            walletService.save(customerWallet);
+            Orders saveOrder = ordersRepository.save(order);
+            return ordersMapper.orderToOrdersResponse(saveOrder);
+        }
+    }
+
+    @Override
     public Orders findById(Long id) {
         return ordersRepository.findById(id)
                 .orElseThrow(() -> new CustomEntityNotFoundException("orders with this id was not found"));
@@ -162,7 +185,7 @@ public class OrdersServiceImpl implements OrdersService {
 
     @Override
     public List<OrdersResponse> findAllDoneOrders(CustomerRequestWithEmail request) {
-        List<Orders> findAllOrder =ordersRepository.findAllByOrderStatusAndCustomerEmail
+        List<Orders> findAllOrder = ordersRepository.findAllByOrderStatusAndCustomerEmail
                 (OrderStatus.ORDER_DONE, request.getCustomerEmail());
         if (findAllOrder.isEmpty()) {
             throw new CustomResourceNotFoundException("There is no result");
