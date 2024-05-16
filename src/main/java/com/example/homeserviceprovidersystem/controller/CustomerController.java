@@ -56,8 +56,8 @@ public class CustomerController {
     }
 
     @PatchMapping(value = "/orderPayment")
-    public ResponseEntity<OrdersResponse> orderPayment(@Valid @RequestBody OrderSummaryRequest request){
-        return new ResponseEntity<>(ordersService.orderPayment(request),HttpStatus.OK);
+    public ResponseEntity<OrdersResponse> orderPayment(@Valid @RequestBody OrderSummaryRequest request) {
+        return new ResponseEntity<>(ordersService.orderPayment(request), HttpStatus.OK);
     }
 
     @GetMapping(value = "/findAllSubDuty")
@@ -88,5 +88,10 @@ public class CustomerController {
     @GetMapping(value = "/findAllStartedOrders")
     public ResponseEntity<List<OrdersResponse>> findAllStartedOrders(@Valid @RequestBody CustomerRequestWithEmail request) {
         return new ResponseEntity<>(ordersService.findAllStartedOrders(request), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/findAllPaidOrders")
+    public ResponseEntity<List<OrdersResponse>> findAllPaidOrders(@Valid @RequestBody CustomerRequestWithEmail request) {
+        return new ResponseEntity<>(ordersService.findAllPaidOrders(request), HttpStatus.OK);
     }
 }

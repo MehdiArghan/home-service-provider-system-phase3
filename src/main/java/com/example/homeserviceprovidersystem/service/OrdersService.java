@@ -27,4 +27,6 @@ public interface OrdersService {
     List<OrdersResponse> findAllDoneOrders(CustomerRequestWithEmail request);
 
     List<OrdersResponse> findAllStartedOrders(CustomerRequestWithEmail request);
+
+    List<OrdersResponse> findAllPaidOrders(CustomerRequestWithEmail request);
 }
