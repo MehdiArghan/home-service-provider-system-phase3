@@ -61,6 +61,11 @@ public class ExpertServiceImpl implements ExpertService {
         return expertMapper.expertToExpertSummaryResponse(savedExpert);
     }
 
+    @Override
+    public Expert save(Expert expert) {
+        return expertRepository.save(expert);
+    }
+
     private void validateRequest(ExpertRequest request) {
         Set<ConstraintViolation<ExpertRequest>> violations = validator.validate(request);
         if (!violations.isEmpty()) {

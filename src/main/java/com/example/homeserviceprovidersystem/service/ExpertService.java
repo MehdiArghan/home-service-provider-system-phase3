@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface ExpertService {
     ExpertSummaryResponse save(MultipartFile multipartFile, ExpertRequest request);
+    Expert save(Expert expert);
 
     ExpertSummaryResponse expertConfirmation(ExpertRequestWithEmail request);
 

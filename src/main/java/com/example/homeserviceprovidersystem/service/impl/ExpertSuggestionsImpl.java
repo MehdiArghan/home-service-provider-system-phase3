@@ -14,7 +14,6 @@ import com.example.homeserviceprovidersystem.entity.Orders;
 import com.example.homeserviceprovidersystem.entity.enums.OrderStatus;
 import com.example.homeserviceprovidersystem.mapper.ExpertSuggestionsMapper;
 import com.example.homeserviceprovidersystem.repositroy.ExpertSuggestionsRepository;
-import com.example.homeserviceprovidersystem.repositroy.OrdersRepository;
 import com.example.homeserviceprovidersystem.service.CustomerService;
 import com.example.homeserviceprovidersystem.service.ExpertService;
 import com.example.homeserviceprovidersystem.service.ExpertSuggestionsService;
@@ -33,7 +32,6 @@ public class ExpertSuggestionsImpl implements ExpertSuggestionsService {
     private final ExpertService expertService;
     private final OrdersService ordersService;
     private final ExpertSuggestionsRepository expertSuggestionsRepository;
-    private final OrdersRepository ordersRepository;
     private final CustomerService customerService;
     private final ExpertSuggestionsMapper expertSuggestionsMapper;
 
@@ -42,13 +40,11 @@ public class ExpertSuggestionsImpl implements ExpertSuggestionsService {
             ExpertService expertService,
             OrdersService ordersService,
             ExpertSuggestionsRepository expertSuggestionsRepository,
-            OrdersRepository ordersRepository,
             CustomerService customerService,
             ExpertSuggestionsMapper expertSuggestionsMapper) {
         this.expertService = expertService;
         this.ordersService = ordersService;
         this.expertSuggestionsRepository = expertSuggestionsRepository;
-        this.ordersRepository = ordersRepository;
         this.customerService = customerService;
         this.expertSuggestionsMapper = expertSuggestionsMapper;
     }
@@ -101,7 +97,7 @@ public class ExpertSuggestionsImpl implements ExpertSuggestionsService {
 
     private void updateOrdersStatus(Orders orders) {
         orders.setOrderStatus(OrderStatus.ORDER_WAITING_FOR_SPECIALIST_SELECTION);
-        ordersRepository.save(orders);
+        ordersService.save(orders);
     }
 
     @Override
@@ -141,7 +137,7 @@ public class ExpertSuggestionsImpl implements ExpertSuggestionsService {
         }
         orders.setOrderStatus(OrderStatus.ORDER_WAITING_FOR_SPECIALIST_TO_WORKPLACE);
         orders.setExpert(expertSuggestion.getExpert());
-        ordersRepository.save(orders);
+        ordersService.save(orders);
         return expertSuggestionsMapper.expertSuggestionToExpertSuggestionsResponse(expertSuggestion);
     }
 }

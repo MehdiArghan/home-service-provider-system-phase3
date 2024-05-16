@@ -1,5 +1,7 @@
 package com.example.homeserviceprovidersystem.controller;
 
+import com.example.homeserviceprovidersystem.dto.comments.CommentRequest;
+import com.example.homeserviceprovidersystem.dto.comments.CommentResponse;
 import com.example.homeserviceprovidersystem.dto.customer.CustomerRequest;
 import com.example.homeserviceprovidersystem.dto.customer.CustomerRequestWithEmail;
 import com.example.homeserviceprovidersystem.dto.customer.CustomerResponse;
@@ -29,6 +31,7 @@ public class CustomerController {
     final SubDutyService subDutyService;
     final ExpertService expertService;
     final ExpertSuggestionsService expertSuggestionsService;
+    final CommentsService commentsService;
 
     @PostMapping("/addCustomer")
     public ResponseEntity<CustomerResponse> saveCustomer(@Valid @RequestBody CustomerRequest request) {
@@ -43,6 +46,11 @@ public class CustomerController {
     @PostMapping(value = "/selectExpertSuggestion")
     public ResponseEntity<ExpertSuggestionsResponse> selectExpertSuggestion(@Valid @RequestBody ExpertSuggestionsRequestWithId request) {
         return new ResponseEntity<>(expertSuggestionsService.selectExpertSuggestion(request), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/addComment")
+    public ResponseEntity<CommentResponse> saveComment(@Valid @RequestBody CommentRequest request) {
+        return new ResponseEntity<>(commentsService.save(request), HttpStatus.CREATED);
     }
 
     @PatchMapping(value = "/selectStartWork")

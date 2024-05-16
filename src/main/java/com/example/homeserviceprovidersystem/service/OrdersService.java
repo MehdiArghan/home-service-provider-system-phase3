@@ -12,6 +12,8 @@ import java.util.List;
 public interface OrdersService {
     OrdersResponse save(OrderRequest request);
 
+    Orders save(Orders orders);
+
     OrdersResponse selectStartWork(OrderSummaryRequest request);
 
     OrdersResponse endOfOrder(OrderSummaryRequest request);

@@ -13,7 +13,6 @@ import com.example.homeserviceprovidersystem.entity.*;
 import com.example.homeserviceprovidersystem.entity.enums.ExpertStatus;
 import com.example.homeserviceprovidersystem.entity.enums.OrderStatus;
 import com.example.homeserviceprovidersystem.mapper.OrdersMapper;
-import com.example.homeserviceprovidersystem.repositroy.ExpertRepository;
 import com.example.homeserviceprovidersystem.repositroy.OrdersRepository;
 import com.example.homeserviceprovidersystem.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +29,8 @@ public class OrdersServiceImpl implements OrdersService {
     private final SubDutyService subDutyService;
     private final ExpertSuggestionsService expertSuggestionsService;
     private final WalletService walletService;
+    private final ExpertService expertService;
     private final OrdersRepository ordersRepository;
-    private final ExpertRepository expertRepository;
     private final OrdersMapper ordersMapper;
 
     @Autowired
@@ -41,14 +40,14 @@ public class OrdersServiceImpl implements OrdersService {
             SubDutyService subDutyService,
             WalletService walletService, OrdersMapper ordersMapper,
             @Lazy ExpertSuggestionsService expertSuggestionsService,
-            ExpertRepository expertRepository) {
+            ExpertService expertService) {
         this.ordersRepository = ordersRepository;
         this.customerService = customerService;
         this.subDutyService = subDutyService;
         this.walletService = walletService;
         this.ordersMapper = ordersMapper;
         this.expertSuggestionsService = expertSuggestionsService;
-        this.expertRepository = expertRepository;
+        this.expertService = expertService;
     }
 
     @Override
@@ -61,6 +60,11 @@ public class OrdersServiceImpl implements OrdersService {
         Address address = createAddress(request.getAddress());
         Orders orders = createOrders(request, customer, subDuty, address);
         return ordersMapper.orderToOrdersResponse(ordersRepository.save(orders));
+    }
+
+    @Override
+    public Orders save(Orders orders) {
+        return ordersRepository.save(orders);
     }
 
     private Address createAddress(AddressRequest addressRequest) {
@@ -122,7 +126,7 @@ public class OrdersServiceImpl implements OrdersService {
             int finalScore = expertScore - delayedWorkingTime;
             expert.setScore(finalScore);
             if (finalScore < 0) expert.setExpertStatus(ExpertStatus.DISABLE);
-            expertRepository.save(expert);
+            expertService.save(expert);
         }
         order.setOrderStatus(OrderStatus.ORDER_DONE);
         Orders saveOrder = ordersRepository.save(order);
