@@ -3,6 +3,8 @@ package com.example.homeserviceprovidersystem.service.impl;
 import com.example.homeserviceprovidersystem.customeException.CustomBadRequestException;
 import com.example.homeserviceprovidersystem.dto.comments.CommentRequest;
 import com.example.homeserviceprovidersystem.dto.comments.CommentResponse;
+import com.example.homeserviceprovidersystem.dto.comments.CommentSummaryRequest;
+import com.example.homeserviceprovidersystem.dto.comments.CommentSummaryResponse;
 import com.example.homeserviceprovidersystem.entity.Comments;
 import com.example.homeserviceprovidersystem.entity.Orders;
 import com.example.homeserviceprovidersystem.entity.enums.OrderStatus;
@@ -47,5 +49,15 @@ public class CommentServiceImpl implements CommentsService {
         comments.setComment(request.getComment());
         comments.setOrders(order);
         return commentsMapper.commentsToCommentResponse(commentsRepository.save(comments));
+    }
+
+    @Override
+    public CommentSummaryResponse findScore(CommentSummaryRequest request) {
+        Comments comments = commentsRepository.findByOrderId(request.getOrderId())
+                .orElseThrow(() -> new CustomBadRequestException("No comments were found for this order"));
+        if (!comments.getOrders().getExpert().getEmail().equals(request.getExpertEmail())) {
+            throw new CustomBadRequestException("No related comments were found");
+        }
+        return commentsMapper.commentsToCommentSummaryResponse(comments);
     }
 }

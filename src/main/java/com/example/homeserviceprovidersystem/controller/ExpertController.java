@@ -1,5 +1,7 @@
 package com.example.homeserviceprovidersystem.controller;
 
+import com.example.homeserviceprovidersystem.dto.comments.CommentSummaryRequest;
+import com.example.homeserviceprovidersystem.dto.comments.CommentSummaryResponse;
 import com.example.homeserviceprovidersystem.dto.expert.ExpertRequest;
 import com.example.homeserviceprovidersystem.dto.expert.ExpertSummaryResponse;
 import com.example.homeserviceprovidersystem.dto.expertsuggestion.ExpertSuggestionsResponse;
@@ -7,10 +9,7 @@ import com.example.homeserviceprovidersystem.dto.expertsuggestion.ExpertSuggesti
 import com.example.homeserviceprovidersystem.dto.order.OrdersResponse;
 import com.example.homeserviceprovidersystem.dto.subduty.SubDutyRequestWithName;
 import com.example.homeserviceprovidersystem.dto.subduty.SubDutyResponse;
-import com.example.homeserviceprovidersystem.service.ExpertService;
-import com.example.homeserviceprovidersystem.service.ExpertSuggestionsService;
-import com.example.homeserviceprovidersystem.service.OrdersService;
-import com.example.homeserviceprovidersystem.service.SubDutyService;
+import com.example.homeserviceprovidersystem.service.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,6 +27,7 @@ public class ExpertController {
     final ExpertService expertService;
     final OrdersService ordersService;
     final ExpertSuggestionsService expertSuggestionsService;
+    final CommentsService commentsService;
 
     @PostMapping("/addExpert")
     public ResponseEntity<ExpertSummaryResponse> saveExpert(
@@ -46,6 +46,11 @@ public class ExpertController {
     @PostMapping(value = "/addExpertSuggestion")
     public ResponseEntity<ExpertSuggestionsResponse> saveExpertSuggestion(@Valid @RequestBody ExpertSuggestionsSummaryRequest request) {
         return new ResponseEntity<>(expertSuggestionsService.save(request), HttpStatus.CREATED);
+    }
+
+    @GetMapping(value = "/showScore")
+    public ResponseEntity<CommentSummaryResponse> findScore(@Valid @RequestBody CommentSummaryRequest request) {
+        return new ResponseEntity<>(commentsService.findScore(request), HttpStatus.OK);
     }
 
     @GetMapping(value = "/findAllSubDuty")
