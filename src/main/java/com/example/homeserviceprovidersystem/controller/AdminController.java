@@ -1,5 +1,7 @@
 package com.example.homeserviceprovidersystem.controller;
 
+import com.example.homeserviceprovidersystem.dto.customer.CustomerSummaryRequest;
+import com.example.homeserviceprovidersystem.dto.customer.CustomerSummaryResponse;
 import com.example.homeserviceprovidersystem.dto.duty.DutyRequest;
 import com.example.homeserviceprovidersystem.dto.duty.DutyResponse;
 import com.example.homeserviceprovidersystem.dto.expert.ExpertRequestWithEmail;
@@ -8,6 +10,7 @@ import com.example.homeserviceprovidersystem.dto.subduty.SubDutyRequest;
 import com.example.homeserviceprovidersystem.dto.subduty.SubDutyRequestWithBasePrice;
 import com.example.homeserviceprovidersystem.dto.subduty.SubDutyRequestWithDescription;
 import com.example.homeserviceprovidersystem.dto.subduty.SubDutyResponse;
+import com.example.homeserviceprovidersystem.service.CustomerService;
 import com.example.homeserviceprovidersystem.service.DutyService;
 import com.example.homeserviceprovidersystem.service.ExpertService;
 import com.example.homeserviceprovidersystem.service.SubDutyService;
@@ -26,6 +29,7 @@ public class AdminController {
     final DutyService dutyService;
     final SubDutyService subDutyService;
     final ExpertService expertService;
+    final CustomerService customerService;
 
     @PostMapping(value = "/addDuty")
     public ResponseEntity<DutyResponse> saveDuty(@Valid @RequestBody DutyRequest dutyRequest) {
@@ -65,5 +69,10 @@ public class AdminController {
     @GetMapping("/findAllDisableExperts")
     public ResponseEntity<List<ExpertSummaryResponse>> findAllDisableExperts() {
         return new ResponseEntity<>(expertService.findAllDisableExperts(), HttpStatus.OK);
+    }
+
+    @GetMapping("/searchCustomer")
+    public ResponseEntity<List<CustomerSummaryResponse>> searchCustomer(@Valid @RequestBody CustomerSummaryRequest request) {
+        return new ResponseEntity<>(customerService.findCustomersByDynamicSearch(request), HttpStatus.OK);
     }
 }
