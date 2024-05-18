@@ -5,6 +5,7 @@ import com.example.homeserviceprovidersystem.dto.customer.CustomerSummaryRespons
 import com.example.homeserviceprovidersystem.dto.duty.DutyRequest;
 import com.example.homeserviceprovidersystem.dto.duty.DutyResponse;
 import com.example.homeserviceprovidersystem.dto.expert.ExpertRequestWithEmail;
+import com.example.homeserviceprovidersystem.dto.expert.ExpertSummaryRequest;
 import com.example.homeserviceprovidersystem.dto.expert.ExpertSummaryResponse;
 import com.example.homeserviceprovidersystem.dto.subduty.SubDutyRequest;
 import com.example.homeserviceprovidersystem.dto.subduty.SubDutyRequestWithBasePrice;
@@ -74,5 +75,10 @@ public class AdminController {
     @GetMapping("/searchCustomer")
     public ResponseEntity<List<CustomerSummaryResponse>> searchCustomer(@Valid @RequestBody CustomerSummaryRequest request) {
         return new ResponseEntity<>(customerService.findCustomersByDynamicSearch(request), HttpStatus.OK);
+    }
+
+    @GetMapping("/searchExpert")
+    public ResponseEntity<List<ExpertSummaryResponse>> searchExpert(@Valid @RequestBody ExpertSummaryRequest request) {
+        return new ResponseEntity<>(expertService.findExpertsByDynamicSearch(request), HttpStatus.OK);
     }
 }

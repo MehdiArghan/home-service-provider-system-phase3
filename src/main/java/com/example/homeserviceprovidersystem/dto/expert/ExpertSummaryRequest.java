@@ -1,5 +1,6 @@
 package com.example.homeserviceprovidersystem.dto.expert;
 
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,5 +15,6 @@ public class ExpertSummaryRequest {
     String firstName;
     String lastName;
     String email;
-    int score;
+    @Pattern(regexp = "^$|^[+-]?\\d+$", message = "Please enter the correct score")
+    String score;
 }

@@ -5,6 +5,7 @@ import com.example.homeserviceprovidersystem.customeException.CustomEntityNotFou
 import com.example.homeserviceprovidersystem.customeException.CustomResourceNotFoundException;
 import com.example.homeserviceprovidersystem.dto.expert.ExpertRequest;
 import com.example.homeserviceprovidersystem.dto.expert.ExpertRequestWithEmail;
+import com.example.homeserviceprovidersystem.dto.expert.ExpertSummaryRequest;
 import com.example.homeserviceprovidersystem.dto.expert.ExpertSummaryResponse;
 import com.example.homeserviceprovidersystem.entity.Expert;
 import com.example.homeserviceprovidersystem.entity.SubDuty;
@@ -15,9 +16,11 @@ import com.example.homeserviceprovidersystem.repositroy.ExpertRepository;
 import com.example.homeserviceprovidersystem.service.ExpertService;
 import com.example.homeserviceprovidersystem.service.SubDutyService;
 import com.example.homeserviceprovidersystem.service.WalletService;
+import jakarta.persistence.criteria.Join;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -145,5 +148,68 @@ public class ExpertServiceImpl implements ExpertService {
         } else {
             return expertList.stream().map(expertMapper::expertToExpertSummaryResponse).toList();
         }
+    }
+
+    @Override
+    public List<ExpertSummaryResponse> findExpertsByDynamicSearch(ExpertSummaryRequest request) {
+        Specification<Expert> specification = Specification.where(null);
+        boolean isRequestValid = false;
+
+        if (isNotEmpty(request.getFirstName())) {
+            specification = specification.and(hasFirstName(request.getFirstName()));
+            isRequestValid = true;
+        }
+        if (isNotEmpty(request.getLastName())) {
+            specification = specification.and(hasLastName(request.getLastName()));
+            isRequestValid = true;
+        }
+        if (isNotEmpty(request.getEmail())) {
+            specification = specification.and(hasEmail(request.getEmail()));
+            isRequestValid = true;
+        }
+        if (isNotEmpty(request.getScore())) {
+            specification = specification.and(hasScore(Integer.parseInt(request.getScore())));
+            isRequestValid = true;
+        }
+        if (isNotEmpty(request.getSubDutyName())) {
+            specification = specification.and(hasSubDutyName(request.getSubDutyName()));
+            isRequestValid = true;
+        }
+        if (!isRequestValid) {
+            throw new CustomBadRequestException("There is no result");
+        }
+        List<Expert> expertList = expertRepository.findAll(specification);
+        if (expertList.isEmpty()) {
+            throw new CustomBadRequestException("There is no result");
+        } else {
+            return expertList.stream().map(expertMapper::expertToExpertSummaryResponse).toList();
+        }
+    }
+
+    private boolean isNotEmpty(String str) {
+        return str != null && !str.isEmpty();
+    }
+
+    private Specification<Expert> hasSubDutyName(String subDutyName) {
+        return ((root, query, criteriaBuilder) -> {
+            Join<Expert, SubDuty> expertSubDutyJoin = root.join("subDuties");
+            return criteriaBuilder.like(expertSubDutyJoin.get("name"), "%" + subDutyName + "%");
+        });
+    }
+
+    private Specification<Expert> hasFirstName(String firstName) {
+        return ((root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("firstName"), "%" + firstName + "%"));
+    }
+
+    private Specification<Expert> hasLastName(String lastName) {
+        return ((root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("lastName"), "%" + lastName + "%"));
+    }
+
+    private Specification<Expert> hasEmail(String email) {
+        return ((root, query, criteriaBuilder) -> criteriaBuilder.like(root.get("email"), "%" + email + "%"));
+    }
+
+    private Specification<Expert> hasScore(int score) {
+        return ((root, query, criteriaBuilder) -> criteriaBuilder.equal(root.get("score"), score));
     }
 }

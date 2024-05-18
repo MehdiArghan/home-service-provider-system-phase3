@@ -2,6 +2,7 @@ package com.example.homeserviceprovidersystem.service;
 
 import com.example.homeserviceprovidersystem.dto.expert.ExpertRequest;
 import com.example.homeserviceprovidersystem.dto.expert.ExpertRequestWithEmail;
+import com.example.homeserviceprovidersystem.dto.expert.ExpertSummaryRequest;
 import com.example.homeserviceprovidersystem.dto.expert.ExpertSummaryResponse;
 import com.example.homeserviceprovidersystem.entity.Expert;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,4 +22,5 @@ public interface ExpertService {
     List<ExpertSummaryResponse> findAllDisableExperts();
 
     List<ExpertSummaryResponse> findAll();
+    List<ExpertSummaryResponse> findExpertsByDynamicSearch(ExpertSummaryRequest request);
 }
