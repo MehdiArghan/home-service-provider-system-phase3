@@ -18,11 +18,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping(value = "/customer")
 public class CustomerController {
@@ -101,5 +102,10 @@ public class CustomerController {
     @GetMapping(value = "/findAllPaidOrders")
     public ResponseEntity<List<OrdersResponse>> findAllPaidOrders(@Valid @RequestBody CustomerRequestWithEmail request) {
         return new ResponseEntity<>(ordersService.findAllPaidOrders(request), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/onlinePayment")
+    public String showOnlinePaymentPortal() {
+        return "onlinePayment";
     }
 }

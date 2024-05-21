@@ -11,6 +11,7 @@ import java.util.List;
 
 public interface ExpertService {
     ExpertSummaryResponse save(MultipartFile multipartFile, ExpertRequest request);
+
     Expert save(Expert expert);
 
     ExpertSummaryResponse expertConfirmation(ExpertRequestWithEmail request);
@@ -22,5 +23,6 @@ public interface ExpertService {
     List<ExpertSummaryResponse> findAllDisableExperts();
 
     List<ExpertSummaryResponse> findAll();
+
     List<ExpertSummaryResponse> findExpertsByDynamicSearch(ExpertSummaryRequest request);
 }
