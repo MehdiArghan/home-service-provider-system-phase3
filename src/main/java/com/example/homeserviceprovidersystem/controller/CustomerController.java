@@ -117,4 +117,9 @@ public class CustomerController {
     public void generateCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
         captchaService.generateCaptcha(request, response);
     }
+
+    @GetMapping("/timeout")
+    public String showTimeOutPage(){
+        return "timeout";
+    }
 }
