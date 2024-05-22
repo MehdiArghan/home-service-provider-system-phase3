@@ -14,6 +14,8 @@ import com.example.homeserviceprovidersystem.dto.order.OrderSummaryRequest;
 import com.example.homeserviceprovidersystem.dto.order.OrdersResponse;
 import com.example.homeserviceprovidersystem.dto.subduty.SubDutyResponse;
 import com.example.homeserviceprovidersystem.service.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -33,6 +36,7 @@ public class CustomerController {
     final ExpertService expertService;
     final ExpertSuggestionsService expertSuggestionsService;
     final CommentsService commentsService;
+    final CaptchaService captchaService;
 
     @PostMapping("/addCustomer")
     public ResponseEntity<CustomerResponse> saveCustomer(@Valid @RequestBody CustomerRequest request) {
@@ -107,5 +111,10 @@ public class CustomerController {
     @GetMapping(value = "/onlinePayment")
     public String showOnlinePaymentPortal() {
         return "onlinePayment";
+    }
+
+    @GetMapping("/generateCaptcha")
+    public void generateCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        captchaService.generateCaptcha(request, response);
     }
 }

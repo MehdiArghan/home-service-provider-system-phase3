@@ -77,16 +77,16 @@
 
 
                         <div class="mb-3">
-                            <label for="amount" class="form-label">Amount :</label>
-                            <input type="text" class="form-control text-center" id="amount" name="amount" maxlength="20"
-                                   pattern="[0-9]{20}" placeholder="amount" required>
+                            <label for="amount" class="form-label">Deposit Money :</label>
+                            <input type="text" class="form-control text-center" id="amount" name="amount"
+                                   pattern="[0-9]" placeholder="Please enter in rial" required>
                         </div>
 
 
                         <div class="mb-3 text-center">
                             <img src="/customer/generateCaptcha" alt="CAPTCHA" id="captchaImage">
                             <button type="button" class="btn btn-link"
-                                    onclick="document.getElementById('captchaImage').src='/customer/generateCaptcha?' + Math.random()">
+                                    onclick=document.getElementById('captchaImage').src='/customer/generateCaptcha?'+Math.random()>
                                 Reload Captcha
                             </button>
                         </div>

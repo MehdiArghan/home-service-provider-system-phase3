@@ -6,8 +6,6 @@ import com.example.homeserviceprovidersystem.dto.customer.CustomerRequest;
 import com.example.homeserviceprovidersystem.dto.customer.CustomerResponse;
 import com.example.homeserviceprovidersystem.dto.customer.CustomerSummaryRequest;
 import com.example.homeserviceprovidersystem.dto.customer.CustomerSummaryResponse;
-import com.example.homeserviceprovidersystem.dto.expert.ExpertSummaryRequest;
-import com.example.homeserviceprovidersystem.dto.expert.ExpertSummaryResponse;
 import com.example.homeserviceprovidersystem.entity.Customer;
 import com.example.homeserviceprovidersystem.entity.Wallet;
 import com.example.homeserviceprovidersystem.mapper.CustomerMapper;
