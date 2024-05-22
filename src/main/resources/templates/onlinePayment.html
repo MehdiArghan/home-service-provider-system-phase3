@@ -22,10 +22,10 @@
         <div class="col-md-5 offset-md-4">
             <div class="card mt-4">
 
-                <div class="card-header text-center"><h4>Online Payment Portal</h4></div>
+                <div class="card-header text-center"><h4 class="text-center">Online Payment Portal</h4></div>
 
                 <div class="card-body">
-                    <form action="" method="post" target="_self">
+                    <form action="/customer/test" method="post" target="_self">
 
                         <div class="mb-3">
                             <label for="cardNumber1" class="form-label">Credit Card Number :</label>
@@ -79,7 +79,7 @@
                         <div class="mb-3">
                             <label for="amount" class="form-label">Deposit Money :</label>
                             <input type="text" class="form-control text-center" id="amount" name="amount"
-                                   pattern="[0-9]" placeholder="Please enter in rial" required>
+                                   min="0" step="1" pattern="^[0-9]+$" placeholder="Please enter to rial" required>
                         </div>
 
 
@@ -99,18 +99,36 @@
                                    pattern="[A-Za-z0-9]{6}" required>
                         </div>
 
-                        <div class="mb-3 text-center">
-                            <button type="submit" class="btn btn-primary">payment</button>
+                        <div class="text-center" style="display: flex; margin-left: 20px;">
+                            <span id="countdown" class="text-dark" style="font-size: 18px"></span>
+                            <button type="submit" class="btn btn-primary" style="margin-left: 180px">payment</button>
                         </div>
-
                     </form>
                 </div>
-
 
             </div>
         </div>
     </div>
 </div>
+
+<script>
+    window.onload = function startTimer() {
+        var timer = 10 * 60;
+        var countdownElement = document.getElementById('countdown');
+
+        var interval = setInterval(function () {
+            minutes = String(Math.floor(timer / 60)).padStart(2, '0');
+            seconds = String(timer % 60).padStart(2, '0');
+
+            countdownElement.textContent = `${minutes}:${seconds}`;
+
+            if (--timer < 0) {
+                clearInterval(interval);
+                window.location.href = '/timeout';
+            }
+        }, 1000);
+    }
+</script>
 
 
 </body>
