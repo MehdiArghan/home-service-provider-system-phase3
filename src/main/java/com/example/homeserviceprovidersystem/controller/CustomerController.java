@@ -110,7 +110,7 @@ public class CustomerController {
         return new ResponseEntity<>(ordersService.findAllPaidOrders(request), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/onlinePayment/{customerEmail}/{orderId}")
+    @GetMapping(value = "/onlinePaymentPortal/{customerEmail}/{orderId}")
     public String onlinePaymentPortal(
             @Email @PathVariable String customerEmail,
             @NonNull @PathVariable Long orderId,

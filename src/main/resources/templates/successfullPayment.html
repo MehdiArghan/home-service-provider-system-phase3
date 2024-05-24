@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>timeout</title>
+    <meta charset="UTF-8">
+    <title>Payment Successful</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width , initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
@@ -13,10 +14,11 @@
 </head>
 <body>
 
+
 <div class="container text-center mt-5">
-    <h1>Session Timed Out</h1>
-    <p>Your session has expired due to inactivity. Please start over.</p>
-    <a th:href="@{/customer/onlinePaymentPortal/{customerEmail}/{orderId}(customerEmail=${session.customerEmail},orderId=${session.orderId})}" class="btn btn-primary">Go to Payment Page</a>
+    <h1>Payment Successful</h1>
+    <h5>Your payment has been processed successfully</h5>
+    <h5>Thank you for your payment</h5>
 </div>
 
 </body>
