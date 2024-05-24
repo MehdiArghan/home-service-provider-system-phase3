@@ -119,7 +119,7 @@ public class CustomerController {
     }
 
     @GetMapping("/timeout")
-    public String showTimeOutPage(){
+    public String showTimeOutPage() {
         return "timeout";
     }
 }
