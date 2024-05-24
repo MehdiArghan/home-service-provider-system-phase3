@@ -1,5 +1,6 @@
 package com.example.homeserviceprovidersystem.service.impl;
 
+import com.example.homeserviceprovidersystem.customeException.CustomIoException;
 import com.example.homeserviceprovidersystem.service.CaptchaService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -17,13 +18,17 @@ import java.util.Random;
 public class CaptchaServiceImpl implements CaptchaService {
 
     @Override
-    public void generateCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        request.getSession().setAttribute("captcha", generateCaptchaText());
-        response.setContentType("image/png");
-        OutputStream outputStream=response.getOutputStream();
-        outputStream.write(generateImageCaptcha(generateCaptchaText()));
-        outputStream.flush();
-        outputStream.close();
+    public void generateCaptcha(HttpServletRequest request, HttpServletResponse response) throws CustomIoException {
+        try {
+            request.getSession().setAttribute("captcha", generateCaptchaText());
+            response.setContentType("image/png");
+            OutputStream outputStream = response.getOutputStream();
+            outputStream.write(generateImageCaptcha(generateCaptchaText()));
+            outputStream.flush();
+            outputStream.close();
+        } catch (IOException e) {
+            throw new CustomIoException("Error generating captcha image");
+        }
     }
 
     private String generateCaptchaText() {
@@ -37,7 +42,7 @@ public class CaptchaServiceImpl implements CaptchaService {
         return captchaText.toString();
     }
 
-    private byte[] generateImageCaptcha(String captchaText) throws IOException {
+    private byte[] generateImageCaptcha(String captchaText) throws CustomIoException {
         int width = 170;
         int height = 60;
         BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
@@ -53,7 +58,11 @@ public class CaptchaServiceImpl implements CaptchaService {
         graphics.drawString(captchaText, x, y);
         graphics.dispose();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ImageIO.write(bufferedImage, "png", baos);
-        return baos.toByteArray();
+        try {
+            ImageIO.write(bufferedImage, "png", baos);
+            return baos.toByteArray();
+        } catch (IOException e) {
+            throw new CustomIoException("Error generating image captcha: ");
+        }
     }
 }

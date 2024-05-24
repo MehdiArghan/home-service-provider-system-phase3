@@ -1,5 +1,6 @@
 package com.example.homeserviceprovidersystem.controller;
 
+import com.example.homeserviceprovidersystem.customeException.CustomIoException;
 import com.example.homeserviceprovidersystem.dto.comments.CommentRequest;
 import com.example.homeserviceprovidersystem.dto.comments.CommentResponse;
 import com.example.homeserviceprovidersystem.dto.customer.CustomerRequest;
@@ -23,7 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @Controller
@@ -114,7 +114,7 @@ public class CustomerController {
     }
 
     @GetMapping("/generateCaptcha")
-    public void generateCaptcha(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void generateCaptcha(HttpServletRequest request, HttpServletResponse response) throws CustomIoException {
         captchaService.generateCaptcha(request, response);
     }
 

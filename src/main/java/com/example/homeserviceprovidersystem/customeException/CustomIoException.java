@@ -7,6 +7,9 @@ import java.io.IOException;
 
 @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 public class CustomIoException extends IOException {
+    public CustomIoException() {
+    }
+
     public CustomIoException(String message) {
         super(message);
     }
