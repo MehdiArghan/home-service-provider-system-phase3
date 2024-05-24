@@ -6,6 +6,7 @@ import com.example.homeserviceprovidersystem.dto.order.OrderSummaryRequest;
 import com.example.homeserviceprovidersystem.dto.order.OrdersResponse;
 import com.example.homeserviceprovidersystem.dto.subduty.SubDutyRequestWithName;
 import com.example.homeserviceprovidersystem.entity.Orders;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -31,4 +32,6 @@ public interface OrdersService {
     List<OrdersResponse> findAllStartedOrders(CustomerRequestWithEmail request);
 
     List<OrdersResponse> findAllPaidOrders(CustomerRequestWithEmail request);
+
+    String onlinePaymentPortal(String customerEmail, Long orderId, HttpServletRequest request);
 }

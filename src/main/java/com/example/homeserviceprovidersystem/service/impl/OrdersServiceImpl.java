@@ -15,6 +15,7 @@ import com.example.homeserviceprovidersystem.entity.enums.OrderStatus;
 import com.example.homeserviceprovidersystem.mapper.OrdersMapper;
 import com.example.homeserviceprovidersystem.repositroy.OrdersRepository;
 import com.example.homeserviceprovidersystem.service.*;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class OrdersServiceImpl implements OrdersService {
@@ -217,6 +219,27 @@ public class OrdersServiceImpl implements OrdersService {
             throw new CustomResourceNotFoundException("There is no result");
         } else {
             return findAllOrder.stream().map(ordersMapper::orderToOrdersResponse).toList();
+        }
+    }
+
+    @Override
+    public String onlinePaymentPortal(String customerEmail, Long orderId, HttpServletRequest request) {
+        Optional<Orders> findOrder = ordersRepository.findById(orderId);
+        if (
+                findOrder.isPresent() &&
+                        findOrder.get().getCustomer().getEmail().equals(customerEmail) &&
+                        findOrder.get().getOrderStatus().equals(OrderStatus.ORDER_DONE)
+        ) {
+            Orders order = findOrder.get();
+            Expert expert = order.getExpert();
+            ExpertSuggestions expertSuggestions = expertSuggestionsService.findByExpertEmailAndOrderId(expert.getEmail(), order.getId());
+            double expertProposedPrice = expertSuggestions.getProposedPrice();
+            request.getSession().setAttribute("money", expertProposedPrice);
+            request.getSession().setAttribute("orderId", order.getId());
+            request.getSession().setAttribute("customerEmail", customerEmail);
+            return "onlinePayment";
+        } else {
+            return "notFound";
         }
     }
 }

@@ -78,7 +78,8 @@
                         <div class="mb-3">
                             <label for="amount" class="form-label">Deposit Money :</label>
                             <input type="text" class="form-control text-center" id="amount" name="amount"
-                                   min="0" step="1" pattern="^[0-9]+$" placeholder="Please enter to rial" required>
+                                   th:value="${session.money != null ? session.money : ''}"
+                                   min="0" step="1" pattern="^[0-9]+$" readonly>
                         </div>
 
 

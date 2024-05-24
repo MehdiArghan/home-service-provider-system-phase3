@@ -18,6 +18,8 @@ import com.example.homeserviceprovidersystem.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -108,9 +110,13 @@ public class CustomerController {
         return new ResponseEntity<>(ordersService.findAllPaidOrders(request), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/onlinePayment")
-    public String showOnlinePaymentPortal() {
-        return "onlinePayment";
+    @GetMapping(value = "/onlinePayment/{customerEmail}/{orderId}")
+    public String onlinePaymentPortal(
+            @Email @PathVariable String customerEmail,
+            @NonNull @PathVariable Long orderId,
+            HttpServletRequest request
+    ) {
+        return ordersService.onlinePaymentPortal(customerEmail, orderId, request);
     }
 
     @GetMapping("/generateCaptcha")

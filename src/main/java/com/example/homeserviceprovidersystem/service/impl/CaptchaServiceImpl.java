@@ -62,7 +62,7 @@ public class CaptchaServiceImpl implements CaptchaService {
             ImageIO.write(bufferedImage, "png", baos);
             return baos.toByteArray();
         } catch (IOException e) {
-            throw new CustomIoException("Error generating image captcha: ");
+            throw new CustomIoException("Error generating image captcha: ",e.getCause());
         }
     }
 }
