@@ -128,4 +128,9 @@ public class CustomerController {
     public String showTimeOutPage() {
         return "timeout";
     }
+
+    @GetMapping("/successfullyPayment")
+    public String showSuccessfullyPayment() {
+        return "successfullyPayment";
+    }
 }
