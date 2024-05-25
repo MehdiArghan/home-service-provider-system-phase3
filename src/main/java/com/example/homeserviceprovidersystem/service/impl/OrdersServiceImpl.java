@@ -16,6 +16,7 @@ import com.example.homeserviceprovidersystem.mapper.OrdersMapper;
 import com.example.homeserviceprovidersystem.repositroy.OrdersRepository;
 import com.example.homeserviceprovidersystem.service.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,7 @@ public class OrdersServiceImpl implements OrdersService {
     private final ExpertService expertService;
     private final OrdersRepository ordersRepository;
     private final OrdersMapper ordersMapper;
+    private final Validator validator;
 
     @Autowired
     public OrdersServiceImpl(
@@ -42,7 +44,8 @@ public class OrdersServiceImpl implements OrdersService {
             SubDutyService subDutyService,
             WalletService walletService, OrdersMapper ordersMapper,
             @Lazy ExpertSuggestionsService expertSuggestionsService,
-            ExpertService expertService) {
+            ExpertService expertService,
+            Validator validator) {
         this.ordersRepository = ordersRepository;
         this.customerService = customerService;
         this.subDutyService = subDutyService;
@@ -50,6 +53,7 @@ public class OrdersServiceImpl implements OrdersService {
         this.ordersMapper = ordersMapper;
         this.expertSuggestionsService = expertSuggestionsService;
         this.expertService = expertService;
+        this.validator = validator;
     }
 
     @Override
