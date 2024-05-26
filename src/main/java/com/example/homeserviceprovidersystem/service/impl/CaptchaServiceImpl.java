@@ -20,10 +20,11 @@ public class CaptchaServiceImpl implements CaptchaService {
     @Override
     public void generateCaptcha(HttpServletRequest request, HttpServletResponse response) throws CustomIoException {
         try {
-            request.getSession().setAttribute("captcha", generateCaptchaText());
+            String captchaText = generateCaptchaText();
+            request.getSession().setAttribute("captcha", captchaText);
             response.setContentType("image/png");
             OutputStream outputStream = response.getOutputStream();
-            outputStream.write(generateImageCaptcha(generateCaptchaText()));
+            outputStream.write(generateImageCaptcha(captchaText));
             outputStream.flush();
             outputStream.close();
         } catch (IOException e) {
@@ -62,7 +63,7 @@ public class CaptchaServiceImpl implements CaptchaService {
             ImageIO.write(bufferedImage, "png", baos);
             return baos.toByteArray();
         } catch (IOException e) {
-            throw new CustomIoException("Error generating image captcha: ",e.getCause());
+            throw new CustomIoException("Error generating image captcha: ", e.getCause());
         }
     }
 }

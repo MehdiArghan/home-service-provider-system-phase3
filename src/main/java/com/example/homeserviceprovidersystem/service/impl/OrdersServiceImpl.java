@@ -4,6 +4,7 @@ import com.example.homeserviceprovidersystem.customeException.CustomBadRequestEx
 import com.example.homeserviceprovidersystem.customeException.CustomEntityNotFoundException;
 import com.example.homeserviceprovidersystem.customeException.CustomResourceNotFoundException;
 import com.example.homeserviceprovidersystem.dto.address.AddressRequest;
+import com.example.homeserviceprovidersystem.dto.cardInformation.CardInformationRequest;
 import com.example.homeserviceprovidersystem.dto.customer.CustomerRequestWithEmail;
 import com.example.homeserviceprovidersystem.dto.order.OrderRequest;
 import com.example.homeserviceprovidersystem.dto.order.OrderSummaryRequest;
@@ -16,15 +17,18 @@ import com.example.homeserviceprovidersystem.mapper.OrdersMapper;
 import com.example.homeserviceprovidersystem.repositroy.OrdersRepository;
 import com.example.homeserviceprovidersystem.service.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class OrdersServiceImpl implements OrdersService {
@@ -245,5 +249,52 @@ public class OrdersServiceImpl implements OrdersService {
         } else {
             return "notFound";
         }
+    }
+
+    @Override
+    public String onlinePayment(String customerEmail, Long orderId, HttpServletRequest request, CardInformationRequest cardInformationRequest) {
+        Optional<Orders> findOrder = ordersRepository.findById(orderId);
+        if (
+                isValidPayment(request, cardInformationRequest) &&
+                        findOrder.isPresent() &&
+                        findOrder.get().getCustomer().getEmail().equals(customerEmail) &&
+                        findOrder.get().getOrderStatus().equals(OrderStatus.ORDER_DONE)
+        ) {
+            Orders order = findOrder.get();
+            Expert expert = order.getExpert();
+            ExpertSuggestions expertSuggestions = expertSuggestionsService.findByExpertEmailAndOrderId(expert.getEmail(), order.getId());
+            double expertProposedPrice = expertSuggestions.getProposedPrice();
+            double depositAmount = Double.parseDouble(cardInformationRequest.getAmount());
+            if (depositAmount != expertProposedPrice) return "failedPayment";
+            Wallet expertWallet = expert.getWallet();
+            double expertAccountBalance = expertWallet.getPrice() + ((70.0 / 100.0) * depositAmount);
+            expertWallet.setPrice(expertAccountBalance);
+            order.setOrderStatus(OrderStatus.ORDER_PAID);
+            walletService.save(expertWallet);
+            ordersRepository.save(order);
+            return "successfullyPayment";
+        } else {
+            return "failedPayment";
+        }
+    }
+
+    private boolean isValidPayment(HttpServletRequest request, CardInformationRequest cardInformationRequest) {
+        if (!isValidCardInformation(cardInformationRequest)) return false;
+
+        String captchaText = (String) request.getSession().getAttribute("captcha");
+        String captchaRequest = cardInformationRequest.getCaptcha();
+        if (!captchaText.equals(captchaRequest)) return false;
+
+        int month = Integer.parseInt(cardInformationRequest.getMonth());
+        int year = Integer.parseInt("20" + cardInformationRequest.getYear());
+        if (month <= 0 || month > 12) return false;
+
+        LocalDate expirationCard = LocalDate.of(year, month, 1);
+        return !expirationCard.isBefore(LocalDate.now());
+    }
+
+    private boolean isValidCardInformation(CardInformationRequest cardInformationRequest) {
+        Set<ConstraintViolation<CardInformationRequest>> violations = validator.validate(cardInformationRequest);
+        return violations.isEmpty();
     }
 }

@@ -33,7 +33,7 @@ public class CardInformationRequest {
     @Pattern(regexp = "^\\d{2}$", message = "Please enter the two digits of the month correctly")
     String month;
     @NotBlank(message = "Please enter the deposit amount correctly")
-    @Pattern(regexp = "^[0-9]+$", message = "Please enter a valid deposit amount (digits only)")
+    @Pattern(regexp = "^(?!0*(\\.0+)?$)(\\d+(\\.\\d{1,2})?)$", message = "Please enter a valid deposit amount")
     String amount;
     @NotBlank(message = "Please enter the correct captcha text")
     String captcha;

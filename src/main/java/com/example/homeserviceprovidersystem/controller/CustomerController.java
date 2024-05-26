@@ -1,6 +1,7 @@
 package com.example.homeserviceprovidersystem.controller;
 
 import com.example.homeserviceprovidersystem.customeException.CustomIoException;
+import com.example.homeserviceprovidersystem.dto.cardInformation.CardInformationRequest;
 import com.example.homeserviceprovidersystem.dto.comments.CommentRequest;
 import com.example.homeserviceprovidersystem.dto.comments.CommentResponse;
 import com.example.homeserviceprovidersystem.dto.customer.CustomerRequest;
@@ -17,6 +18,7 @@ import com.example.homeserviceprovidersystem.dto.subduty.SubDutyResponse;
 import com.example.homeserviceprovidersystem.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import lombok.NonNull;
@@ -58,6 +60,29 @@ public class CustomerController {
     @PostMapping(value = "/addComment")
     public ResponseEntity<CommentResponse> saveComment(@Valid @RequestBody CommentRequest request) {
         return new ResponseEntity<>(commentsService.save(request), HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/onlinePayment/{customerEmail}/{orderId}")
+    public String onlinePayment(
+            @Email @PathVariable String customerEmail,
+            @NonNull @PathVariable Long orderId,
+            HttpServletRequest request,
+            @RequestParam("cardNumber1") String cardNumber1,
+            @RequestParam("cardNumber2") String cardNumber2,
+            @RequestParam("cardNumber3") String cardNumber3,
+            @RequestParam("cardNumber4") String cardNumber4,
+            @RequestParam("cvv2") String cvv2,
+            @RequestParam("year") String year,
+            @RequestParam("month") String month,
+            @RequestParam("amount") String amount,
+            @RequestParam("captcha") String captcha
+    ) {
+        return ordersService.onlinePayment(
+                customerEmail,
+                orderId,
+                request,
+                new CardInformationRequest(cardNumber1, cardNumber2, cardNumber3, cardNumber4, cvv2, year, month, amount, captcha)
+        );
     }
 
     @PatchMapping(value = "/selectStartWork")
